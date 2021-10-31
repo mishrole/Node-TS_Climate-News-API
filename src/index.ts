@@ -1,9 +1,9 @@
 // Import packages
 import express, { Request, Response, Application } from 'express'
-import * as dotenv from 'dotenv'
-import axios from 'axios'
-import * as cheerio from 'cheerio'
 import { Article } from './models/article.model';
+import axios from 'axios'
+import * as dotenv from 'dotenv'
+import * as cheerio from 'cheerio'
 
 // Env variables
 dotenv.config({ path: __dirname+'/.env' });
@@ -19,11 +19,26 @@ app.get("/", (req: Request, res: Response) : void => {
     res.json("Welcome to Climate News API")
 });
 
-const articles: Article[] = [];
+const newspapers = [
+    { 
+        name: 'Guardian',
+        url: 'https://www.theguardian.com/environment/climate-crisis'
+    },
+    { 
+        name: 'The Times', 
+        url: 'https://www.thetimes.co.uk/environment/climate-change'
+    },
+    { 
+        name: 'Telegraph', 
+        url: 'https://www.telegraph.co.uk/climate-change/'
+    }
+]
 
-app.get('/news', (req: Request, res: Response) => {
-    axios.get("https://www.theguardian.com/environment/climate-crisis")
+const getNews = () => {
+    let result = axios.get("https://www.theguardian.com/environment/climate-crisis")
     .then((response) => {
+        const articles: Article[] = [];
+
         const html = response.data
         //res.json(html)
         const $ = cheerio.load(html)
@@ -36,20 +51,22 @@ app.get('/news', (req: Request, res: Response) => {
             
         });
 
-        res.json(articles)
+        return articles
+        //res.json(articles)
+
     }).catch((err) => {
         console.error(err);
     })
+
+    return result
+}
+
+app.get('/news', async (req: Request, res: Response) => {
+    const news = await getNews()
+    res.json(news)
 })
 
 // Listen to the server port
 app.listen(PORT, () : void => {
     console.log(`Server running on port ${PORT}`);
 });
-
-
-// function sum(num1 : number, num2 : number) {
-//     return num1+ num2;
-// }
-
-// console.log(sum(9,11));
