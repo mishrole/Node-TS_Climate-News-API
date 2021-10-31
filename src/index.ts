@@ -22,48 +22,52 @@ app.get("/", (req: Request, res: Response) : void => {
 const newspapers = [
     { 
         name: 'Guardian',
+        base: 'https://www.theguardian.com',
         url: 'https://www.theguardian.com/environment/climate-crisis'
     },
     { 
-        name: 'The Times', 
+        name: 'The Times',
+        base: 'https://www.thetimes.co.uk',
         url: 'https://www.thetimes.co.uk/environment/climate-change'
     },
     { 
         name: 'Telegraph', 
-        url: 'https://www.telegraph.co.uk/climate-change/'
+        base: 'https://www.telegraph.co.uk',
+        url: 'https://www.telegraph.co.uk/climate-change'
     }
 ]
 
+let articles: Article[] = [];
+
 const getNews = () => {
-    let result = axios.get("https://www.theguardian.com/environment/climate-crisis")
-    .then((response) => {
-        const articles: Article[] = [];
+    articles = []
+    newspapers.forEach(async (newspaper) => {
+        await axios.get(newspaper.url)
+        .then(response => {
+            const html = response.data;
+            const $ = cheerio.load(html);
+    
+            $('a:contains("climate")', html).each(function () {
+                const title = $(this).text().trim();
+                let url = $(this).attr('href');
 
-        const html = response.data
-        //res.json(html)
-        const $ = cheerio.load(html)
-        
-        // Arrow function doesn't work here
-        $('a:contains("climate")', html).each(function() {
-            const title = $(this).text().trim()
-            const url = $(this).attr('href')
-            articles.push({title, url})
-            
-        });
+                if(!(`${url}`.includes(newspaper.base))) {
+                    url = `${newspaper.base}${$(this).attr('href')}`;
+                }
 
-        return articles
-        //res.json(articles)
-
-    }).catch((err) => {
-        console.error(err);
+                //const url = `${newspaper.base}${$(this).attr('href')}`;
+                
+                articles.push({ title, url, source: newspaper.name });
+            });
+        }).catch(err => console.error(err.message));  
     })
-
-    return result
 }
 
+getNews();
+
+// Route /news
 app.get('/news', async (req: Request, res: Response) => {
-    const news = await getNews()
-    res.json(news)
+    res.json(articles);
 })
 
 // Listen to the server port
