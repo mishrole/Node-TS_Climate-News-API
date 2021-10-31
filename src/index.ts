@@ -8,6 +8,7 @@ import { Newspaper } from './models/newspaper.model';
 import path from 'path';
 
 // Env variables
+// TODO: Check environment variables
 dotenv.config({ path: __dirname+'/.env' });
 
 // Initialize Express inside Typescript
@@ -143,6 +144,8 @@ app.get("/", (req: Request, res: Response) : void => {
 });
 
 app.get('/news', async (req: Request, res: Response) => {
+    // How can I use this? (Request)
+    // getAllNews()
     res.json(allArticles);
 });
 
