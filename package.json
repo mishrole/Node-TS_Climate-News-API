@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node ./src/index.ts",
-    "build": "rm -rf dist/ && prettier --write source/ && tsc",
+    "build": "rm -rf dist/ && tsc",
     "dev": "ts-node-dev --respawn ./src/index.ts",
     "dev-error-start": "nodemon ./src/index.ts"
   },
