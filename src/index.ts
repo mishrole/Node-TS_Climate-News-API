@@ -14,7 +14,7 @@ dotenv.config({ path: __dirname+'/.env' });
 // Initialize Express inside Typescript
 const app : Application = express();
 // Set the server port
-const PORT = process.env.PORT || 9191;
+const PORT = process.env.PORT || 3000;
 
 const newspapers : Newspaper[] = [
     {
@@ -140,7 +140,8 @@ getAllNews();
 
 // Set routes
 app.get("/", (req: Request, res: Response) : void => {
-    res.sendFile(path.join(__dirname + '/index.html'))
+    //res.sendFile(path.join(__dirname + '/index.html'))
+    res.json({title: "Welcome to the Climate Crisis News API"})
 });
 
 app.get('/news', async (req: Request, res: Response) => {
